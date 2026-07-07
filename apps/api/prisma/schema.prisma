@@ -1,0 +1,68 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id             Int           @id
+  username       String        @unique
+  initialBalance Int           @map("initial_balance")
+  balance        Int
+  createdAt      String        @map("created_at")
+  bets           Bet[]
+  ledgerEntries  LedgerEntry[]
+
+  @@map("users")
+}
+
+model Bet {
+  id           Int           @id @default(autoincrement())
+  userId       Int           @map("user_id")
+  gameId       String        @map("game_id")
+  amount       Int
+  status       String
+  result       String?
+  payoutAmount Int?          @map("payout_amount")
+  createdAt    String        @map("created_at")
+  settledAt    String?       @map("settled_at")
+  canceledAt   String?       @map("canceled_at")
+  user         User          @relation(fields: [userId], references: [id])
+  ledgerEntries LedgerEntry[]
+
+  @@index([userId])
+  @@map("bets")
+}
+
+model LedgerEntry {
+  id             Int     @id @default(autoincrement())
+  userId         Int     @map("user_id")
+  betId          Int?    @map("bet_id")
+  type           String
+  amount         Int
+  idempotencyKey String? @map("idempotency_key")
+  createdAt      String  @map("created_at")
+  user           User    @relation(fields: [userId], references: [id])
+  bet            Bet?    @relation(fields: [betId], references: [id])
+
+  @@index([userId])
+  @@index([betId, type])
+  @@map("ledger_entries")
+}
+
+model IdempotencyKey {
+  id             Int    @id @default(autoincrement())
+  key            String
+  scope          String
+  requestHash    String @map("request_hash")
+  responseStatus Int    @map("response_status")
+  responseBody   String @map("response_body")
+  createdAt      String @map("created_at")
+
+  @@unique([scope, key])
+  @@map("idempotency_keys")
+}

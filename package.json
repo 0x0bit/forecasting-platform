@@ -1,0 +1,21 @@
+{
+  "name": "forecasting-platform-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.7.0",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r --parallel dev",
+    "start:api": "pnpm --filter @forecasting/api prisma:migrate && CI=true pnpm --filter @forecasting/api start:dev",
+    "start:web": "pnpm --filter @forecasting/web dev",
+    "start:dev": "pnpm -r --parallel dev",
+    "test": "pnpm --filter @forecasting/api test",
+    "test:cov": "pnpm --filter @forecasting/api test:cov",
+    "test:e2e": "pnpm --filter @forecasting/api test:e2e"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^26.1.0",
+    "typescript": "^6.0.3"
+  }
+}
